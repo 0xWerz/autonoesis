@@ -84,4 +84,3 @@ jobs:
           else
             echo "No new posts detected"
           fi
-ad
