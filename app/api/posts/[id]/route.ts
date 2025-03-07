@@ -6,10 +6,10 @@ import { marked } from "marked";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const postId = params.id;
+    const { id } = await params;
     const postsDirectory = path.join(process.cwd(), "posts");
 
     // Check if directory exists
@@ -21,7 +21,7 @@ export async function GET(
     }
 
     // Find the post file
-    const postFile = `${postId}.md`;
+    const postFile = `${id}.md`;
     const fullPath = path.join(postsDirectory, postFile);
 
     // Check if file exists
@@ -41,7 +41,7 @@ export async function GET(
     // Return post data
     return NextResponse.json({
       post: {
-        id: postId,
+        id: id,
         title: data.title || "Untitled",
         date: data.date || new Date().toISOString().split("T")[0],
         content: htmlContent,
