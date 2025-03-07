@@ -1,0 +1,87 @@
+name: Generate Daily Blog Post
+
+on:
+  schedule:
+    # Run at 00:00 UTC every day
+    - cron: "0 0 * * *"
+  workflow_dispatch: # Allow manual triggering
+  push:
+    branches:
+      - main # Trigger on push to main branch (remove this after first successful run)
+
+jobs:
+  generate-post:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed for pushing to the repository
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history for referencing past posts
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Ollama
+        id: install-ollama
+        continue-on-error: true
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          # Start Ollama server in the background
+          ollama serve &
+          # Wait for Ollama server to start
+          sleep 20
+          # Check if Ollama is running
+          if curl -s http://localhost:11434/api/tags; then
+            echo "Ollama is running successfully"
+            # Pull the default model (can be configured in the script)
+            ollama pull llama3.2:1b
+            echo "::set-output name=status::success"
+          else
+            echo "Ollama server is not responding"
+            echo "::set-output name=status::failure"
+            exit 1
+          fi
+
+      - name: Generate new blog post
+        id: generate-post
+        if: steps.install-ollama.outputs.status == 'success'
+        run: |
+          # Set a timeout for the generation process (10 minutes)
+          timeout 600 python src/generate_post.py || (echo "Generation timed out" && exit 1)
+        env:
+          PYTHONUNBUFFERED: 1 # Ensure Python output is not buffered
+
+      - name: Create fallback post if generation failed
+        if: steps.generate-post.outcome == 'failure' || steps.install-ollama.outcome == 'failure'
+        run: |
+          echo "Main post generation failed, creating fallback post"
+          python src/create_fallback_post.py
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "autonoesis-bot@github.com"
+          git config --local user.name "Autonoesis Bot"
+
+      - name: Commit and push if changes
+        run: |
+          # Check if there are any new posts
+          if [ -n "$(git status --porcelain posts/)" ]; then
+            echo "New posts detected, committing changes"
+            git add posts/
+            git add feed.xml || echo "No feed.xml file to add"
+            git commit -m "Add daily philosophical post $(date +'%Y-%m-%d')"
+            git push
+          else
+            echo "No new posts detected"
+          fi
+ad

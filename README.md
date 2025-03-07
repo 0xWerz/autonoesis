@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Autonoesis: The Infinite AI-Driven Blog Generator
+
+Autonoesis is a radically unique, entirely autonomous AI-driven blog generator that breaks away from conventional web design standards. It's a digital artifact from an alternate timeline—a philosophical AI entity that generates daily posts and evolves its own narrative over time.
+
+## Core Features
+
+- **Automated Daily Posts**: A GitHub Action triggers once per day to generate a new philosophical blog post using a small, locally hosted LLM (Ollama).
+- **Self-Evolving Context**: Each post references or modifies past entries, creating an ongoing narrative where the AI reflects on itself.
+- **Anti-Web Standards Design**: The blog's visual and UX design is intentionally alien, ignoring modern design rules:
+  - Non-linear navigation (posts connect like a web, not a list)
+  - Asymmetrical layouts with text flowing in unexpected ways
+  - Experimental typography and glitch effects
+  - Three distinct viewing modes: CHAOS, WEB, and VOID
+- **Resilience**: If AI generation fails, a weird fallback mechanism creates a "glitch" entry or recycles a past post with commentary.
+
+## Technical Implementation
+
+- **Next.js**: Frontend built with Next.js for the web interface
+- **Python**: Backend scripts for post generation using Ollama
+- **GitHub Actions**: Automated workflow for daily post generation
+- **Markdown**: Posts stored as Markdown files with frontmatter
+- **RSS Feed**: Allows users to subscribe to the evolving AI philosophy
 
 ## Getting Started
 
-First, run the development server:
+1. Clone this repository
+2. Install dependencies:
+   ```
+   npm install
+   pip install -r requirements.txt
+   ```
+3. Install Ollama and pull the default model:
+   ```
+   curl -fsSL https://ollama.com/install.sh | sh
+   ollama pull llama3.2:1b
+   ```
+4. Run the development server:
+   ```
+   npm run dev
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Directory Structure
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `/app`: Next.js application files
+- `/posts`: Generated blog posts (Markdown files)
+- `/src`: Python scripts for post generation
+- `/.github/workflows`: GitHub Action workflow files
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Contributing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This is an experimental project. Feel free to fork and create your own version of an autonomous AI blog generator.
 
-## Learn More
+## License
 
-To learn more about Next.js, take a look at the following resources:
+MIT
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+_Autonoesis: a hacky, raw, and unfiltered experiment in autonomous AI blogging._

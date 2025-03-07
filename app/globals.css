@@ -1,26 +1,173 @@
-@import "tailwindcss";
+@import "tailwindcss/preflight";
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Simplified NGE-inspired color palette */
+  --nerv-purple: #9a359a;
+  --nerv-green: #00ff00;
+  --nerv-red: #ff0000;
+  --nerv-dark: #111111;
+  --nerv-gray: #333333;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--nerv-dark);
+  color: white;
+  font-family: 'JetBrains Mono', monospace, sans-serif;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* Minimal terminal container */
+.terminal-container {
+  background-color: rgba(17, 17, 17, 0.95);
+  border-left: 2px solid var(--nerv-purple);
+  position: relative;
+}
+
+/* Simple header */
+.terminal-header {
+  border-bottom: 1px solid var(--nerv-purple);
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  color: var(--nerv-purple);
+}
+
+/* Content area */
+.terminal-content {
+  padding: 1.5rem;
+  position: relative;
+}
+
+/* Status indicators */
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-normal {
+  background-color: var(--nerv-green);
+  box-shadow: 0 0 5px var(--nerv-green);
+}
+
+.status-warning {
+  background-color: #ff9900;
+  box-shadow: 0 0 5px #ff9900;
+}
+
+.status-error {
+  background-color: var(--nerv-red);
+  box-shadow: 0 0 5px var(--nerv-red);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--nerv-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--nerv-purple);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b347b3;
+}
+
+/* Card styles */
+.nerv-card {
+  border-left: 2px solid var(--nerv-purple);
+  background-color: rgba(26, 26, 26, 0.8);
+  transition: all 0.2s ease;
+}
+
+.nerv-card:hover {
+  background-color: rgba(35, 35, 35, 0.9);
+  transform: translateY(-2px);
+}
+
+/* Button styles */
+.nerv-button {
+  background-color: transparent;
+  color: var(--nerv-purple);
+  border: 1px solid var(--nerv-purple);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+  padding: 0.5rem 1rem;
+}
+
+.nerv-button:hover {
+  background-color: var(--nerv-purple);
+  color: white;
+}
+
+.nerv-button.active {
+  background-color: var(--nerv-purple);
+  color: white;
+}
+
+/* Prose customizations */
+.prose {
+  max-width: 65ch;
+  color: #e0e0e0;
+}
+
+.prose h1, 
+.prose h2, 
+.prose h3, 
+.prose h4 {
+  color: var(--nerv-purple);
+  letter-spacing: 0.5px;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose h2 {
+  font-size: 1.4em;
+  border-bottom: 1px solid rgba(154, 53, 154, 0.3);
+  padding-bottom: 0.3em;
+}
+
+.prose p {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  line-height: 1.7;
+}
+
+.prose a {
+  color: var(--nerv-green);
+  text-decoration: none;
+}
+
+.prose a:hover {
+  text-decoration: underline;
+}
+
+.prose blockquote {
+  border-left: 2px solid var(--nerv-purple);
+  padding-left: 1em;
+  font-style: italic;
+  color: #b0b0b0;
+}
+
+.prose code {
+  background-color: rgba(17, 17, 17, 0.8);
+  padding: 0.2em 0.4em;
+  font-size: 0.9em;
+  color: var(--nerv-green);
+}
+
+.prose pre {
+  background-color: rgba(17, 17, 17, 0.8);
+  padding: 1em;
+  border-left: 2px solid var(--nerv-purple);
+  overflow-x: auto;
 }
