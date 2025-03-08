@@ -44,7 +44,7 @@ jobs:
           if curl -s http://localhost:11434/api/tags; then
             echo "Ollama is running successfully"
             # Pull the default model (can be configured in the script)
-            ollama pull llama3.2:1b
+            ollama pull llama3.2:3b
             echo "::set-output name=status::success"
           else
             echo "Ollama server is not responding"
@@ -71,12 +71,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18"
-
-      - name: Install Node.js dependencies
-        run: npm ci
-
-      - name: Generate RSS feed
-        run: npm run generate-rss
 
       - name: Configure Git
         run: |

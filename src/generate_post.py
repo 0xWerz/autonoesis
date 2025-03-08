@@ -11,7 +11,7 @@ from feedgen.feed import FeedGenerator
 import ollama
 
 # Configuration
-MODEL = "llama3.2:1b"  # Default model, can be changed
+MODEL = "llama3.2:3b"  # Default model, can be changed
 POSTS_DIR = "posts"
 MAX_PAST_POSTS = 5  # Maximum number of past posts to reference
 
