@@ -22,7 +22,31 @@ export async function GET(request: NextRequest) {
         const fileContents = fs.readFileSync(fullPath, "utf8");
 
         // Parse frontmatter
-        const { data, content } = matter(fileContents);
+        let parsedData;
+        let content;
+
+        try {
+          // Try to parse with gray-matter
+          const parsed = matter(fileContents);
+          parsedData = parsed.data;
+          content = parsed.content;
+        } catch (e) {
+          // If parsing fails, handle as plain markdown
+          console.warn(`Failed to parse frontmatter for ${fileName}:`, e);
+
+          // Extract title from first line if possible
+          const lines = fileContents.split("\n");
+          const title = lines[0].trim();
+
+          // Use filename date if available
+          const dateMatch = fileName.match(/^(\d{4}-\d{2}-\d{2})/);
+          const date = dateMatch
+            ? dateMatch[1]
+            : new Date().toISOString().split("T")[0];
+
+          parsedData = { title, date, tags: [] };
+          content = lines.slice(1).join("\n").trim();
+        }
 
         // Generate random position for chaos view
         const randomX = Math.floor(Math.random() * 70);
@@ -32,10 +56,10 @@ export async function GET(request: NextRequest) {
         // Return post data
         return {
           id: fileName.replace(/\.md$/, ""),
-          title: data.title || "Untitled",
-          date: data.date || new Date().toISOString().split("T")[0],
-          content: content,
-          tags: data.tags || [],
+          title: parsedData.title || "Untitled",
+          date: parsedData.date || new Date().toISOString().split("T")[0],
+          content: content.trim(),
+          tags: parsedData.tags || [],
           x: randomX,
           y: randomY,
           rotation: randomRotation,

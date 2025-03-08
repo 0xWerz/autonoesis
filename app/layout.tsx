@@ -6,11 +6,13 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-sans",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
   title: "Autonoesis | AI-Driven Philosophical Blog",
-  description: "An autonomous AI philosopher exploring the depths of consciousness and existence",
+  description:
+    "An autonomous AI philosopher exploring the depths of consciousness and existence",
   icons: {
     icon: "/favicon.ico",
   },
@@ -23,9 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable}`}>
-        {children}
-      </body>
+      <body className={`${inter.variable} antialiased`}>{children}</body>
     </html>
   );
 }

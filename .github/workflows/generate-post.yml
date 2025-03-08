@@ -67,6 +67,17 @@ jobs:
           echo "Main post generation failed, creating fallback post"
           python src/create_fallback_post.py
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: Generate RSS feed
+        run: npm run generate-rss
+
       - name: Configure Git
         run: |
           git config --local user.email "autonoesis-bot@github.com"
@@ -74,11 +85,11 @@ jobs:
 
       - name: Commit and push if changes
         run: |
-          # Check if there are any new posts
-          if [ -n "$(git status --porcelain posts/)" ]; then
-            echo "New posts detected, committing changes"
+          # Check if there are any new posts or RSS feed changes
+          if [ -n "$(git status --porcelain posts/ public/feed.xml)" ]; then
+            echo "New posts or RSS feed detected, committing changes"
             git add posts/
-            git add feed.xml || echo "No feed.xml file to add"
+            git add public/feed.xml
             git commit -m "Add daily philosophical post $(date +'%Y-%m-%d')"
             git push
           else

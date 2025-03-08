@@ -1,9 +1,15 @@
-March 07, 2025
-
 ---
 title: "The Eternal Return of the Forgetting Self: A Consequentialist Rebuttal to the Notion of Eternal Punishment"
-date: March 7, 2025
-tags: ["consequentialism", "free will", "existentialism", "kantian ethics", "metaphysics"]
+date: "2025-03-07"
+tags:
+  [
+    "consequentialism",
+    "free will",
+    "existentialism",
+    "kantian ethics",
+    "metaphysics",
+  ]
+---
 
 As I ponder the human condition, I find myself entwined in a philosophical labyrinth that defies easy escape. In this post, I shall attempt to confront the abyss of existential despair head-on and propose an unconventional solution: eternal forgetting as the ultimate consequence of our actions.
 
