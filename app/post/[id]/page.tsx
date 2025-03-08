@@ -69,11 +69,15 @@ export default function PostPage() {
 
   if (isError || !post) {
     return (
-      <div className="min-h-screen bg-[#111111] text-white flex flex-col items-center justify-center p-6">
-        <div className="text-xl mb-8">Post not found</div>
-        <Link href="/" className="nerv-button">
-          Return to home
-        </Link>
+      <div className="min-h-screen bg-[#050505] text-[#ff6600] flex flex-col items-center justify-center p-8">
+        <div className="terminal-container p-8 text-center">
+          <div className="text-2xl mb-10 tracking-[0.2em] uppercase">
+            <span className="text-[#ff0000]">Error:</span> Report Not Found
+          </div>
+          <Link href="/" className="nerv-button">
+            Return to Terminal
+          </Link>
+        </div>
       </div>
     );
   }
@@ -81,28 +85,39 @@ export default function PostPage() {
   const postStatus = getPostStatus(post);
 
   return (
-    <div className="min-h-screen bg-[#111111] text-white">
+    <div className="min-h-screen bg-[#050505] text-[#ff6600]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#111111] border-b border-[#333333]">
-        <div className="max-w-4xl mx-auto px-6 py-5 flex justify-between items-center">
-          <Link href="/" className="text-[#9a359a] hover:text-[#b347b3]">
-            ← Back to all posts
-          </Link>
-          <div className="flex items-center">
-            <span className={`status-indicator status-${postStatus}`}></span>
-            <span className="text-xs text-gray-400 ml-3">
-              {formatDate(post.date)}
-            </span>
+      <header className="sticky top-0 z-50 bg-[#0a0a0a] border-b border-[#ff6600]">
+        <div className="page-container">
+          <div className="flex justify-between items-center py-6">
+            <Link
+              href="/"
+              className="text-[#ff6600] hover:text-[#ff8533] transition-colors group inline-flex items-center tracking-[0.2em] uppercase"
+            >
+              <span className="transform group-hover:-translate-x-1 transition-transform">←</span>
+              <span className="ml-2">Return to Terminal</span>
+            </Link>
+            <div className="flex items-center">
+              <span className={`status-indicator status-${postStatus}`}></span>
+              <span className="text-sm text-[#ff8533] ml-4 tracking-[0.2em] uppercase">
+                {formatDate(post.date)}
+              </span>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="max-w-4xl mx-auto px-6 py-10">
-        <article className="terminal-container">
-          <div className="terminal-content p-8">
-            <div className="mb-8">
-              <h1 className="text-3xl font-medium text-white">{post.title}</h1>
+      <main className="page-container py-16">
+        <article className="terminal-container max-w-4xl mx-auto">
+          <div className="terminal-header">
+            <span>PHILOSOPHICAL REPORT</span>
+          </div>
+          <div className="terminal-content">
+            <div className="mb-12">
+              <h1 className="text-4xl font-medium text-white tracking-[0.1em] uppercase">
+                {post.title}
+              </h1>
             </div>
 
             <div
@@ -113,25 +128,16 @@ export default function PostPage() {
         </article>
 
         {/* Navigation */}
-        <div className="mt-10">
-          <Link href="/" className="nerv-button">
-            All posts
+        <div className="mt-16 max-w-4xl mx-auto">
+          <Link
+            href="/"
+            className="nerv-button inline-flex items-center"
+          >
+            <span className="transform group-hover:-translate-x-1 transition-transform">←</span>
+            <span className="ml-2">Return to Terminal</span>
           </Link>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="mt-16 py-8 border-t border-[#333333]">
-        <div className="max-w-4xl mx-auto px-6 flex justify-center">
-          <a
-            href="/feed.xml"
-            target="_blank"
-            className="text-[#9a359a] hover:text-white text-sm"
-          >
-            RSS Feed
-          </a>
-        </div>
-      </footer>
     </div>
   );
 }

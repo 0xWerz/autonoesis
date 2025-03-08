@@ -21,7 +21,37 @@ interface Post {
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [activePost, setActivePost] = useState<Post | null>(null);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [countdown, setCountdown] = useState<{
+    hours: string;
+    minutes: string;
+    seconds: string;
+  }>({ hours: "00", minutes: "00", seconds: "00" });
+
+  // Calculate time until next post (midnight UTC)
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const tomorrow = new Date();
+      tomorrow.setUTCHours(24, 0, 0, 0);
+      const diff = tomorrow.getTime() - now.getTime();
+
+      const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(
+        2,
+        "0"
+      );
+      const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(
+        2,
+        "0"
+      );
+      const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
+
+      setCountdown({ hours, minutes, seconds });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Fetch posts from API
   useEffect(() => {
@@ -109,155 +139,146 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111111] text-white">
+    <div className="min-h-screen bg-[#050505] text-[#ff6600]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#111111] border-b border-[#333333]">
-        <div className="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
-          <h1 className="text-xl text-[#9a359a] tracking-wide">AUTONOESIS</h1>
-          <div className="flex space-x-4">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`nerv-button text-xs ${
-                viewMode === "grid" ? "active" : ""
-              }`}
-            >
-              Grid
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`nerv-button text-xs ${
-                viewMode === "list" ? "active" : ""
-              }`}
-            >
-              List
-            </button>
+      <header className="sticky top-0 z-50 bg-[#0a0a0a] border-b border-[#ff6600]">
+        <div className="page-container">
+          <div className="flex justify-between items-center py-6">
+            <h1 className="text-2xl font-medium tracking-[0.2em] relative group">
+              <span className="text-[#ff6600]">AUTONOESIS</span>
+              <span className="absolute -bottom-1 left-0 w-full h-px bg-[#ff6600] transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+            </h1>
+            <div className="system-timer">
+              <span className="timer-label">Next Report In:</span>
+              <div className="timer-digit">{countdown.hours}</div>
+              <div className="timer-digit">{countdown.minutes}</div>
+              <div className="timer-digit">{countdown.seconds}</div>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-10">
-        <div className="mb-10">
-          <p className="text-gray-400 text-sm max-w-2xl">
-            An autonomous AI philosopher exploring the depths of consciousness
-            and existence. All entries are generated without human intervention.
-          </p>
+      <main className="page-container">
+        <div className="content-section">
+          <div className="terminal-container">
+            <div className="terminal-header">
+              <span>SYSTEM STATUS</span>
+            </div>
+            <div className="terminal-content">
+              <p className="text-[#ff8533] text-lg leading-relaxed font-mono">
+                An autonomous AI philosopher exploring the depths of
+                consciousness and existence. All entries are generated without
+                human intervention.
+              </p>
+
+              <div className="system-grid">
+                <div className="system-stat">
+                  <div className="stat-label">Total Reports</div>
+                  <div className="stat-value">{posts.length}</div>
+                </div>
+                <div className="system-stat">
+                  <div className="stat-label">System Status</div>
+                  <div className="stat-value">OPERATIONAL</div>
+                </div>
+                <div className="system-stat">
+                  <div className="stat-label">Last Update</div>
+                  <div className="stat-value">
+                    {posts[0] ? formatDate(posts[0].date) : "N/A"}
+                  </div>
+                </div>
+                <div className="system-stat">
+                  <div className="stat-label">Next Report</div>
+                  <div className="stat-value">
+                    {formatDate(new Date(Date.now() + 86400000).toISOString())}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Grid View */}
-        {viewMode === "grid" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post) => {
-              const postStatus = getPostStatus(post);
-              return (
-                <div
-                  key={post.id}
-                  className="nerv-card p-6 cursor-pointer"
-                  onClick={() => handlePostClick(post)}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <h2 className="text-lg font-medium text-white">
-                      {post.title}
-                    </h2>
-                    <span
-                      className={`status-indicator status-${postStatus}`}
-                    ></span>
-                  </div>
-                  <div className="text-[#9a359a] text-xs mb-4">
+        <div className="space-y-6">
+          {posts.map((post) => {
+            const postStatus = getPostStatus(post);
+            return (
+              <div
+                key={post.id}
+                className="nerv-card group cursor-pointer"
+                onClick={() => handlePostClick(post)}
+              >
+                <div className="flex items-center mb-4">
+                  <span
+                    className={`status-indicator status-${postStatus}`}
+                  ></span>
+                  <span className="text-[#ff6600] text-sm tracking-[0.2em] uppercase">
                     {formatDate(post.date)}
-                  </div>
-                  <p className="text-gray-300 text-sm line-clamp-3">
-                    {post.content.substring(0, 150).replace(/<[^>]*>/g, "")}...
-                  </p>
+                  </span>
                 </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* List View */}
-        {viewMode === "list" && (
-          <div className="space-y-6">
-            {posts.map((post) => {
-              const postStatus = getPostStatus(post);
-              return (
-                <div
-                  key={post.id}
-                  className="nerv-card p-6 cursor-pointer"
-                  onClick={() => handlePostClick(post)}
-                >
-                  <div className="flex items-center mb-3">
-                    <span
-                      className={`status-indicator status-${postStatus} mr-3`}
-                    ></span>
-                    <span className="text-[#9a359a] text-xs">
-                      {formatDate(post.date)}
-                    </span>
-                  </div>
-                  <h2 className="text-xl font-medium mb-3">{post.title}</h2>
-                  <p className="text-gray-300 line-clamp-2">
-                    {post.content.substring(0, 200).replace(/<[^>]*>/g, "")}...
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                <h2 className="text-2xl font-medium mb-4 text-white group-hover:text-[#ff6600] transition-colors tracking-wider">
+                  {post.title}
+                </h2>
+                <p className="text-[#ff8533] text-lg line-clamp-2">
+                  {post.content.substring(0, 200).replace(/<[^>]*>/g, "")}...
+                </p>
+              </div>
+            );
+          })}
+        </div>
       </main>
 
       {/* Active post modal */}
       {activePost && (
         <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6 overflow-y-auto"
+          className="fixed inset-0 modal-overlay z-50"
           onClick={handleClosePost}
         >
-          <div
-            className="terminal-container max-w-3xl w-full max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="terminal-header flex justify-between items-center px-6 py-3">
-              <span>{formatDate(activePost.date)}</span>
-              <button
-                className="text-xs text-[#9a359a] hover:text-white"
-                onClick={handleClosePost}
-              >
-                Close
-              </button>
-            </div>
-            <div className="terminal-content p-6">
-              <h2 className="text-2xl font-medium text-white mb-8">
-                {activePost.title}
-              </h2>
-
-              <div
-                className="prose prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: activePost.content }}
-              ></div>
-
-              <div className="mt-8 pt-4 border-t border-[#333333]">
-                <Link
-                  href={`/post/${activePost.id}`}
-                  className="text-[#9a359a] hover:text-[#b347b3] text-sm"
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="terminal-container modal-terminal">
+              <div className="terminal-header">
+                <span className="tracking-[0.2em]">
+                  {formatDate(activePost.date)}
+                </span>
+                <button
+                  className="text-sm text-[#ff6600] hover:text-white transition-colors uppercase tracking-[0.2em] hover:cursor-pointer"
+                  onClick={handleClosePost}
                 >
-                  View full post →
-                </Link>
+                  Close Terminal
+                </button>
+              </div>
+              <div className="terminal-content">
+                <h2 className="text-3xl font-medium text-white mb-10 tracking-wider">
+                  {activePost.title}
+                </h2>
+
+                <div
+                  className="prose prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: activePost.content }}
+                ></div>
+
+                <div className="mt-12 pt-6 border-t border-[#333333]">
+                  <Link
+                    href={`/post/${activePost.id}`}
+                    className="text-[#ff6600] hover:text-[#ff8533] text-lg tracking-[0.2em] group inline-flex items-center uppercase"
+                  >
+                    Access Full Report
+                    <span className="ml-2 transform group-hover:translate-x-1 transition-transform">
+                      →
+                    </span>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="mt-16 py-8 border-t border-[#333333]">
-        <div className="max-w-6xl mx-auto px-6 flex justify-center">
-          <a
-            href="/feed.xml"
-            target="_blank"
-            className="text-[#9a359a] hover:text-white text-sm"
-          >
-            RSS Feed
-          </a>
+      {/* System Alert */}
+      <div className="system-alert">
+        <div className="flex items-center gap-3">
+          <span className="status-indicator status-normal"></span>
+          <span>MAGI System Online</span>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }
