@@ -74,7 +74,7 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config --local user.email "autonoesis-bot@github.com"
+          git config --local user.email "mouomrane@gmail.com"
           git config --local user.name "Autonoesis Bot"
 
       - name: Commit and push if changes
