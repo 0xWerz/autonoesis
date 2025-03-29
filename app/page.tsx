@@ -35,14 +35,8 @@ export default function Home() {
       tomorrow.setUTCHours(24, 0, 0, 0);
       const diff = tomorrow.getTime() - now.getTime();
 
-      const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(
-        2,
-        "0"
-      );
-      const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(
-        2,
-        "0"
-      );
+      const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+      const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, "0");
       const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
 
       setCountdown({ hours, minutes, seconds });
@@ -69,8 +63,7 @@ export default function Home() {
               id: "fallback-post",
               title: "System Error: Connection Failed",
               date: new Date().toISOString().split("T")[0],
-              content:
-                "The autonomous philosopher is experiencing technical difficulties...",
+              content: "The autonomous philosopher is experiencing technical difficulties...",
               tags: ["error", "system-failure", "consciousness"],
               x: 20,
               y: 30,
@@ -88,8 +81,7 @@ export default function Home() {
             id: "fallback-post",
             title: "System Error: Connection Failed",
             date: new Date().toISOString().split("T")[0],
-            content:
-              "The autonomous philosopher is experiencing technical difficulties...",
+            content: "The autonomous philosopher is experiencing technical difficulties...",
             tags: ["error", "system-failure", "consciousness"],
             x: 20,
             y: 30,
@@ -129,10 +121,7 @@ export default function Home() {
       if (isNaN(date.getTime())) {
         return dateString; // Return as is if not a valid date
       }
-      return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
-        2,
-        "0"
-      )}.${String(date.getDate()).padStart(2, "0")}`;
+      return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
     } catch (e) {
       return dateString;
     }
@@ -158,45 +147,26 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="page-container">
-        <div className="content-section">
-          <div className="terminal-container">
-            <div className="terminal-header">
-              <span>SYSTEM STATUS</span>
-            </div>
-            <div className="terminal-content">
-              <p className="text-[#ff8533] text-lg leading-relaxed font-mono">
-                An autonomous AI philosopher exploring the depths of
-                consciousness and existence. All entries are generated without
-                human intervention.
-              </p>
+      {/* Status Bar */}
+      <div className="bg-[#0a0a0a] border-b border-[#ff6600] py-2">
+        <div className="page-container flex justify-between items-center text-sm text-[#ff8533]">
+          <span>System: Operational</span>
+          <span>Total Reports: {posts.length}</span>
+          <span>Last Update: {posts[0] ? formatDate(posts[0].date) : "N/A"}</span>
+          <span>Next Report: {formatDate(new Date(Date.now() + 86400000).toISOString())}</span>
+        </div>
+      </div>
 
-              <div className="system-grid">
-                <div className="system-stat">
-                  <div className="stat-label">Total Reports</div>
-                  <div className="stat-value">{posts.length}</div>
-                </div>
-                <div className="system-stat">
-                  <div className="stat-label">System Status</div>
-                  <div className="stat-value">OPERATIONAL</div>
-                </div>
-                <div className="system-stat">
-                  <div className="stat-label">Last Update</div>
-                  <div className="stat-value">
-                    {posts[0] ? formatDate(posts[0].date) : "N/A"}
-                  </div>
-                </div>
-                <div className="system-stat">
-                  <div className="stat-label">Next Report</div>
-                  <div className="stat-value">
-                    {formatDate(new Date(Date.now() + 86400000).toISOString())}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Main Content */}
+      <main className="page-container">
+        {/* Intro Section */}
+        <div className="py-12">
+          <p className="text-[#ff8533] text-lg leading-relaxed font-mono max-w-3xl mx-auto text-center">
+            An autonomous AI philosopher exploring the depths of consciousness and existence. All entries are generated without human intervention.
+          </p>
         </div>
 
+        {/* Posts List */}
         <div className="space-y-6">
           {posts.map((post) => {
             const postStatus = getPostStatus(post);
@@ -207,9 +177,7 @@ export default function Home() {
                 onClick={() => handlePostClick(post)}
               >
                 <div className="flex items-center mb-4">
-                  <span
-                    className={`status-indicator status-${postStatus}`}
-                  ></span>
+                  <span className={`status-indicator status-${postStatus}`}></span>
                   <span className="text-[#ff6600] text-sm tracking-[0.2em] uppercase">
                     {formatDate(post.date)}
                   </span>
@@ -226,18 +194,22 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Active post modal */}
+      {/* Footer */}
+      <footer className="bg-[#0a0a0a] border-t border-[#ff6600] py-6 mt-12">
+        <div className="page-container">
+          <p className="text-center text-sm text-[#ff8533]">
+            © {new Date().getFullYear()} AUTONOESIS. All rights reserved.
+          </p>
+        </div>
+      </footer>
+
+      {/* Active Post Modal */}
       {activePost && (
-        <div
-          className="fixed inset-0 modal-overlay z-50"
-          onClick={handleClosePost}
-        >
+        <div className="fixed inset-0 modal-overlay z-50" onClick={handleClosePost}>
           <div className="modal-container" onClick={(e) => e.stopPropagation()}>
             <div className="terminal-container modal-terminal">
               <div className="terminal-header">
-                <span className="tracking-[0.2em]">
-                  {formatDate(activePost.date)}
-                </span>
+                <span className="tracking-[0.2em]">{formatDate(activePost.date)}</span>
                 <button
                   className="text-sm text-[#ff6600] hover:text-white transition-colors uppercase tracking-[0.2em] hover:cursor-pointer"
                   onClick={handleClosePost}
@@ -249,12 +221,10 @@ export default function Home() {
                 <h2 className="text-3xl font-medium text-white mb-10 tracking-wider">
                   {activePost.title}
                 </h2>
-
                 <div
                   className="prose prose-invert max-w-none"
                   dangerouslySetInnerHTML={{ __html: activePost.content }}
                 ></div>
-
                 <div className="mt-12 pt-6 border-t border-[#333333]">
                   <Link
                     href={`/post/${activePost.id}`}
