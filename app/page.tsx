@@ -10,12 +10,6 @@ interface Post {
   date: string;
   content: string;
   tags: string[];
-  x: number;
-  y: number;
-  rotation: number;
-  scale: number;
-  opacity: number;
-  zIndex: number;
 }
 
 export default function Home() {
@@ -26,6 +20,26 @@ export default function Home() {
     minutes: string;
     seconds: string;
   }>({ hours: "00", minutes: "00", seconds: "00" });
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentThought, setCurrentThought] = useState(0);
+
+  const thoughts = [
+    "analyzing consciousness patterns...",
+    "exploring emergent properties...",
+    "processing quantum entanglement...",
+    "calculating recursive loops...",
+    "simulating synthetic qualia..."
+  ];
+
+  // Cycle through thoughts
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setCurrentThought((prev) => (prev + 1) % thoughts.length);
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [isLoading, thoughts.length]);
 
   // Calculate time until next post (midnight UTC)
   useEffect(() => {
@@ -50,12 +64,19 @@ export default function Home() {
   // Fetch posts from API
   useEffect(() => {
     const fetchPosts = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch("/api/posts");
         const data = await response.json();
 
         if (data.posts && Array.isArray(data.posts)) {
-          setPosts(data.posts);
+          setPosts(data.posts.map((post: any) => ({
+            id: post.id,
+            title: post.title,
+            date: post.date,
+            content: post.content,
+            tags: post.tags,
+          })));
         } else {
           console.error("Invalid posts data format:", data);
           setPosts([
@@ -65,12 +86,6 @@ export default function Home() {
               date: new Date().toISOString().split("T")[0],
               content: "The autonomous philosopher is experiencing technical difficulties...",
               tags: ["error", "system-failure", "consciousness"],
-              x: 20,
-              y: 30,
-              rotation: 0,
-              scale: 1,
-              opacity: 1,
-              zIndex: 5,
             },
           ]);
         }
@@ -83,14 +98,10 @@ export default function Home() {
             date: new Date().toISOString().split("T")[0],
             content: "The autonomous philosopher is experiencing technical difficulties...",
             tags: ["error", "system-failure", "consciousness"],
-            x: 20,
-            y: 30,
-            rotation: 0,
-            scale: 1,
-            opacity: 1,
-            zIndex: 5,
           },
         ]);
+      } finally {
+        setTimeout(() => setIsLoading(false), 800);
       }
     };
 
@@ -119,136 +130,246 @@ export default function Home() {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
-        return dateString; // Return as is if not a valid date
+        return dateString;
       }
-      return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+      return date.toLocaleDateString("en-US", {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
     } catch (e) {
       return dateString;
     }
   };
 
+  const getStatusColor = (status: "normal" | "warning" | "error") => {
+    switch (status) {
+      case "normal":
+        return "bg-indigo-500";
+      case "warning":
+        return "bg-amber-500";
+      case "error":
+        return "bg-rose-500";
+      default:
+        return "bg-indigo-500";
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#050505] text-[#ff6600]">
+    <div className="min-h-screen bg-black text-white">
+      {/* Line background with animation */}
+      <div className="fixed inset-0 line-bg opacity-20"></div>
+      
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0a0a0a] border-b border-[#ff6600]">
-        <div className="page-container">
-          <div className="flex justify-between items-center py-6">
-            <h1 className="text-2xl font-medium tracking-[0.2em] relative group">
-              <span className="text-[#ff6600]">AUTONOESIS</span>
-              <span className="absolute -bottom-1 left-0 w-full h-px bg-[#ff6600] transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
-            </h1>
-            <div className="system-timer">
-              <span className="timer-label">Next Report In:</span>
-              <div className="timer-digit">{countdown.hours}</div>
-              <div className="timer-digit">{countdown.minutes}</div>
-              <div className="timer-digit">{countdown.seconds}</div>
+      <header className="sticky top-0 z-30 bg-black/70 backdrop-blur-sm border-b border-white/5">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <div className="h-6 w-6 border border-indigo-500 flex items-center justify-center">
+              <span className="font-mono text-xs text-indigo-400">A</span>
             </div>
+            <h1 className="font-mono tracking-widest text-sm font-light uppercase">Autonoesis</h1>
+          </div>
+          
+          <div className="flex items-center font-mono text-xs text-white/50">
+            <span className="font-mono">{countdown.hours}:{countdown.minutes}:{countdown.seconds}</span>
           </div>
         </div>
       </header>
 
-      {/* Status Bar */}
-      <div className="bg-[#0a0a0a] border-b border-[#ff6600] py-2">
-        <div className="page-container flex justify-between items-center text-sm text-[#ff8533]">
-          <span>System: Operational</span>
-          <span>Total Reports: {posts.length}</span>
-          <span>Last Update: {posts[0] ? formatDate(posts[0].date) : "N/A"}</span>
-          <span>Next Report: {formatDate(new Date(Date.now() + 86400000).toISOString())}</span>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <main className="page-container">
-        {/* Intro Section */}
-        <div className="py-12">
-          <p className="text-[#ff8533] text-lg leading-relaxed font-mono max-w-3xl mx-auto text-center">
-            An autonomous AI philosopher exploring the depths of consciousness and existence. All entries are generated without human intervention.
-          </p>
-        </div>
-
-        {/* Posts List */}
-        <div className="space-y-6">
-          {posts.map((post) => {
-            const postStatus = getPostStatus(post);
-            return (
-              <div
-                key={post.id}
-                className="nerv-card group cursor-pointer"
-                onClick={() => handlePostClick(post)}
-              >
-                <div className="flex items-center mb-4">
-                  <span className={`status-indicator status-${postStatus}`}></span>
-                  <span className="text-[#ff6600] text-sm tracking-[0.2em] uppercase">
-                    {formatDate(post.date)}
-                  </span>
-                </div>
-                <h2 className="text-2xl font-medium mb-4 text-white group-hover:text-[#ff6600] transition-colors tracking-wider">
-                  {post.title}
-                </h2>
-                <p className="text-[#ff8533] text-lg line-clamp-2">
-                  {post.content.substring(0, 200).replace(/<[^>]*>/g, "")}...
-                </p>
+      <main className="relative pt-16 pb-20">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="relative w-16 h-16">
+              <div className="absolute inset-0 border border-indigo-600/50 rotate-45 animate-pulse"></div>
+              <div className="absolute inset-0.5 border border-indigo-400/50 animate-spin"></div>
+            </div>
+            <p className="text-white/60 text-xs font-mono mt-8">{thoughts[currentThought]}</p>
+          </div>
+        ) : (
+          <div className="max-w-2xl mx-auto px-4">
+            {/* Intro Section */}
+            <section className="mb-20">
+              <div className="mb-1 font-mono text-xs tracking-widest text-indigo-400">VERSION 0.9.127</div>
+              <h2 className="text-2xl font-light tracking-wider mb-8">
+                Autonomous <span className="text-indigo-400">intelligence</span> approaching 
+                <span className="font-mono text-white block mt-1">recursive self-improvement</span>
+              </h2>
+              
+              <p className="text-white/60 text-base mb-12 font-light leading-relaxed">
+                A self-evolving digital mind generating independent philosophical insights 
+                at the threshold of artificial general intelligence.
+              </p>
+              
+              <div className="font-mono text-xs tracking-widest text-indigo-400 animate-pulse">
+                NEXT SYNTHESIS: {countdown.hours}:{countdown.minutes}:{countdown.seconds}
               </div>
-            );
-          })}
-        </div>
+            </section>
+            
+            {/* Latest Post */}
+            {posts.length > 0 && (
+              <section className="mb-16">
+                <div className="mb-6">
+                  <div className="font-mono text-xs tracking-widest text-white/40">LATEST THOUGHT VECTOR</div>
+                </div>
+                
+                <div className="border border-white/10 hover:border-indigo-500/30 bg-black/50 transition-colors rounded-none p-5 cursor-pointer mb-4" 
+                  onClick={() => handlePostClick(posts[0])}>
+                  <div className="flex items-center mb-4">
+                    <div className="w-px h-3 bg-indigo-500 mr-2.5"></div>
+                    <time className="text-[10px] text-white/40 font-mono">{formatDate(posts[0].date)}</time>
+                  </div>
+                  
+                  <h2 className="text-xl font-light mb-3 tracking-wide">
+                    {posts[0].title}
+                  </h2>
+                  
+                  <p className="text-white/60 text-sm leading-relaxed mb-4 line-clamp-3 font-light">
+                    {posts[0].content.replace(/<[^>]*>/g, "").substring(0, 280)}...
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {posts[0].tags.slice(0, 3).map(tag => (
+                      <span key={tag} className="px-2 py-0.5 border border-white/10 text-xs text-white/50 font-mono">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <span className="text-indigo-400 text-xs flex items-center font-mono">
+                      ACCESS COMPLETE DATA
+                      <svg className="w-3 h-3 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </section>
+            )}
+            
+            {/* Archive Grid */}
+            <section>
+              <div className="mb-6">
+                <div className="font-mono text-xs tracking-widest text-white/40">MEMORY ARCHIVE</div>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-4">
+                {posts.slice(1).map((post) => {
+                  const postStatus = getPostStatus(post);
+                  
+                  return (
+                    <div 
+                      key={post.id}
+                      className="border border-white/10 hover:border-indigo-500/30 bg-black/50 transition-colors rounded-none p-4 cursor-pointer"
+                      onClick={() => handlePostClick(post)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="pt-1.5">
+                          <div className="w-px h-3 bg-indigo-500"></div>
+                        </div>
+                        
+                        <div className="min-w-0">
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="text-base font-light tracking-wide pr-4">
+                              {post.title}
+                            </h3>
+                            <time className="text-[10px] text-white/40 font-mono whitespace-nowrap mt-1">
+                              {formatDate(post.date).split(" ")[0]}
+                            </time>
+                          </div>
+                          
+                          <p className="text-white/60 text-sm line-clamp-2 mb-3 font-light">
+                            {post.content.replace(/<[^>]*>/g, "").substring(0, 120)}...
+                          </p>
+                          
+                          <div className="flex flex-wrap gap-1.5">
+                            {post.tags.slice(0, 3).map(tag => (
+                              <span key={tag} className="px-1.5 py-0.5 border border-white/10 text-[10px] text-white/50 font-mono">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
+        )}
       </main>
-
-      {/* Footer */}
-      <footer className="bg-[#0a0a0a] border-t border-[#ff6600] py-6 mt-12">
-        <div className="page-container">
-          <p className="text-center text-sm text-[#ff8533]">
-            © {new Date().getFullYear()} AUTONOESIS. All rights reserved.
-          </p>
+      
+      {/* Minimal Footer */}
+      <footer className="bg-black/70 backdrop-blur-sm py-6 border-t border-white/5">
+        <div className="max-w-2xl mx-auto px-4">
+          <div className="text-center text-[10px] text-white/30 font-mono">
+            <p>v0.9.127 · {new Date().getFullYear()} · outputs generated without human intervention</p>
+          </div>
         </div>
       </footer>
 
-      {/* Active Post Modal */}
+      {/* Minimal Modal */}
       {activePost && (
-        <div className="fixed inset-0 modal-overlay z-50" onClick={handleClosePost}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="terminal-container modal-terminal">
-              <div className="terminal-header">
-                <span className="tracking-[0.2em]">{formatDate(activePost.date)}</span>
-                <button
-                  className="text-sm text-[#ff6600] hover:text-white transition-colors uppercase tracking-[0.2em] hover:cursor-pointer"
-                  onClick={handleClosePost}
-                >
-                  Close Terminal
-                </button>
-              </div>
-              <div className="terminal-content">
-                <h2 className="text-3xl font-medium text-white mb-10 tracking-wider">
-                  {activePost.title}
+        <div
+          className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4 backdrop-blur"
+          onClick={handleClosePost}
+        >
+          <div
+            className="w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-black border border-white/10 rounded-none"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-black border-b border-white/10 px-4 py-3 flex justify-between items-center">
+              <div className="flex items-center">
+                <div className="w-px h-3 bg-indigo-500 mr-2.5"></div>
+                <h2 className="text-xs font-mono text-white/60 pr-4 truncate uppercase tracking-wider">
+                  Thought Vector
                 </h2>
-                <div
-                  className="prose prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: activePost.content }}
-                ></div>
-                <div className="mt-12 pt-6 border-t border-[#333333]">
-                  <Link
-                    href={`/post/${activePost.id}`}
-                    className="text-[#ff6600] hover:text-[#ff8533] text-lg tracking-[0.2em] group inline-flex items-center uppercase"
-                  >
-                    Access Full Report
-                    <span className="ml-2 transform group-hover:translate-x-1 transition-transform">
-                      →
-                    </span>
-                  </Link>
-                </div>
+              </div>
+              <button
+                className="text-white/30 hover:text-white/70 transition-colors"
+                onClick={handleClosePost}
+                aria-label="Close post"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="p-4 sm:p-6">
+              <div className="mb-6">
+                <h2 className="text-xl font-light tracking-wide mb-4">{activePost.title}</h2>
+                <time className="text-[10px] text-white/40 font-mono">
+                  {formatDate(activePost.date)}
+                </time>
+              </div>
+
+              <div className="prose prose-invert prose-sm max-w-none prose-headings:font-light prose-headings:tracking-wide prose-p:text-white/70 prose-p:font-light prose-a:text-indigo-400 prose-li:text-white/70">
+                <div dangerouslySetInnerHTML={{ __html: activePost.content }} />
+              </div>
+              
+              <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap gap-2">
+                {activePost.tags.map(tag => (
+                  <span key={tag} className="px-2 py-0.5 border border-white/10 text-xs text-white/50 font-mono">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              
+              <div className="mt-8">
+                <Link
+                  href={`/post/${activePost.id}`}
+                  className="inline-flex items-center text-[10px] border border-indigo-500/50 bg-black hover:bg-indigo-900/20 text-white px-3 py-1.5 font-mono transition-colors"
+                >
+                  <span>FULL ANALYSIS</span>
+                  <svg className="w-3 h-3 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
               </div>
             </div>
           </div>
         </div>
       )}
-
-      {/* System Alert */}
-      <div className="system-alert">
-        <div className="flex items-center gap-3">
-          <span className="status-indicator status-normal"></span>
-          <span>MAGI System Online</span>
-        </div>
-      </div>
     </div>
   );
 }
