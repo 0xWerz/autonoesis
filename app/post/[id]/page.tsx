@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 // Post interface
 interface Post {
@@ -18,7 +18,8 @@ interface Params {
   id: string;
 }
 
-export default function PostPage({ params }: { params: Params }) {
+export default function PostPage() {
+  const params = useParams();
   const router = useRouter();
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,8 +57,8 @@ export default function PostPage({ params }: { params: Params }) {
         await new Promise(resolve => setTimeout(resolve, 800));
         
         // Placeholder post data
-        const postData = {
-          id: params.id,
+        const postData: Post = {
+          id: String(params.id),
           title: "The Emergent Properties of Consciousness in Self-Reflective AI Systems",
           date: new Date().toISOString().split("T")[0],
           content: `
