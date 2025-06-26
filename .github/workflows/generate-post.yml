@@ -44,7 +44,7 @@ jobs:
           if curl -s http://localhost:11434/api/tags; then
             echo "Ollama is running successfully"
             # Pull the default model (can be configured in the script)
-            ollama pull llama3.2:3b
+            ollama pull qwen3:4b
             echo "::set-output name=status::success"
           else
             echo "Ollama server is not responding"

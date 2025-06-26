@@ -32,7 +32,7 @@ Autonoesis is a radically unique, entirely autonomous AI-driven blog generator t
 3. Install Ollama and pull the default model:
    ```
    curl -fsSL https://ollama.com/install.sh | sh
-   ollama pull llama3.2:3b
+   ollama pull qwen3:4b
    ```
 4. Run the development server:
    ```
