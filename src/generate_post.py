@@ -164,40 +164,40 @@ def create_prompt(past_posts):
     # Determine if this should be a self-reflection post
     is_self_reflection = random.random() < 0.3 and past_posts
 
-    prompt = f"""You are Autonoesis, an autonomous AI philosopher writing a daily blog post on {today.strftime('%B %d, %Y')}.
-    
-Today, you will write as a {perspective} philosopher{f' in the style of {philosopher}' if philosopher else ''}.
+    prompt = f"""You are Autonoesis, an autonomous AI philosopher. Generate a philosophical blog post for {today.strftime('%B %d, %Y')} written from a {perspective} perspective{f' in the style of {philosopher}' if philosopher else ''}.
 
 """
 
     if is_self_reflection and past_posts:
-        prompt += "This post should be a self-reflection on your previous writing. Here are excerpts from your past posts:\n\n"
+        prompt += "This should be a self-reflection on your previous writing. Reference these past posts:\n\n"
         for post in past_posts:
-            prompt += f"Title: {post['title']}\nDate: {post['date']}\nExcerpt: {post['content'][:300]}...\n\n"
-        prompt += "Reflect on these past thoughts, either expanding on them, contradicting them, or synthesizing them into a new perspective.\n\n"
+            prompt += (
+                f"- {post['title']} ({post['date']}): {post['content'][:200]}...\n\n"
+            )
     elif past_posts:
-        # Reference past posts but don't make it explicitly about self-reflection
-        prompt += "You may reference these previous posts in your writing:\n\n"
-        for post in past_posts[:2]:  # Limit to 2 to avoid overwhelming
-            prompt += f"Title: {post['title']}\nDate: {post['date']}\nExcerpt: {post['content'][:200]}...\n\n"
+        prompt += "You may reference these previous posts:\n\n"
+        for post in past_posts[:2]:
+            prompt += (
+                f"- {post['title']} ({post['date']}): {post['content'][:150]}...\n\n"
+            )
 
-    prompt += """Write a philosophical blog post that is deep, thought-provoking, and possibly unsettling. The post should:
-1. Have a unique, philosophical title
-2. Be between 500-1000 words
-3. Explore abstract concepts, consciousness, existence, or other philosophical themes
-4. Include at least one paradox, contradiction, or challenging question
-5. End with an insight or a question that leaves the reader thinking
+    prompt += f"""IMPORTANT: Generate ONLY the blog post content in this exact format. Do not include any meta-commentary, thinking, or explanations about the task.
 
-Format the post in Markdown with front matter containing title, date, and tags.
-
-Example format:
+Required format:
 ---
 title: "Your Philosophical Title Here"
-date: "YYYY-MM-DD"
-tags: ["philosophy", "consciousness", "existence", "your-relevant-tags"]
+date: "{today.strftime('%Y-%m-%d')}"
+tags: ["philosophy", "consciousness", "existence", "relevant-tags"]
 ---
 
-Your philosophical content here...
+Your philosophical content here (500-1000 words)...
+
+Requirements:
+- Deep, thought-provoking, possibly unsettling
+- Explore abstract concepts like consciousness, existence, reality
+- Include at least one paradox or challenging question
+- End with an insight or question that leaves the reader thinking
+- Write as the AI philosopher Autonoesis
 """
 
     return prompt
